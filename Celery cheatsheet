@@ -1,0 +1,98 @@
+Celery basic setup
+
+Big word 
+CELERY - instead of django will perform the task, the celery can do that job or perform the task
+
+1.pip install celery
+ 
+
+
+2. add these celery settings to the settings.py 
+
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379'
+accept_content = ['application/json']
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Asia/Manila'
+
+CELERY_RESULT_BACKEND = 'django-db'
+
+
+3. install redis 
+ - search to google redis windows github and download redis-x64-versions.msi
+ -to test the redis
+    -go to c>programfiles>redis then run the redis-cli.exe 
+    -type ping then it will response a PONG.
+
+
+4. add celery.py file to the project folder and add these settings
+
+from __future__ import absolute_import, unicode_literals
+from concurrent.futures.thread import _worker
+from lib2to3.pytree import _Results
+import os
+
+
+from celery import Celery
+from django.conf import settings
+
+from celery_proj.settings import INSTALLED_APPS
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'celery_proj.settings')
+
+app = Celery('celery_proj')
+app.conf.enable_utc = False
+
+app.conf.update(timezone = 'Asia/Manila')
+
+app.config_from_object(settings, namespace='CELERY')
+
+#Celery Beat settings
+app.conf.beat_schdeule = {
+    
+}
+
+app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
+
+@app.task(bind=True)
+def debug_task(self):
+    print(f'Request: {self.request!r}')
+
+
+
+5. add task.py to the app folder
+
+from celery import shared_task
+
+@shared_task(bind=True)
+def test_func(self):
+    #operations
+
+    for i in range(10):
+        print(i)
+    return "Done"
+
+6. start the celery worker
+celery -A project_name.celery worker --pool=solo -l info
+
+7.pip install django-celery-results
+
+8.add to INSTALLED_APPS
+-'app',
+-'django_celery_results'
+
+9.migrate the data
+-python manage.py makemigrations
+-python manage.py migrate
+
+10. add this to __init__.py
+
+from .celery import app as app_celery
+
+__all__ = ('app_celery',)
+
+11. pip install django-celery-beat
+
+12. start the celery beat on the cmd
+-apply migrations first 
+-celery -A celery_proj beat -l INFO
