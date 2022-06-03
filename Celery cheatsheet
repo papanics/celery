@@ -1,3 +1,55 @@
+packages we use:
+1.Celery
+2.Django Celery Beat
+3. Django Celery Results
+
+
+What is Celery?
+- a task queue for executing work outside a Python web application HTTP request-response cycle.
+-A task queue's input is a unit of work called a task. Didicated worker processes constantly monitor task queues for
+new  work to perform.
+-Celery is written in Python, but the protocol can be implemented in any lanugae. In a addition to Python, there's
+node-celery and node-celery-ts for Node.js, and a PHP client.
+-Broker(taskque) -> ex. Redis, RabbitMQ, Amazon SQS 
+-FIFO --> t1,t2,t3
+-schedule a task in every 30secs that send an API request to the Third party API to update our database.
+-serialization ex. pickle, json, yaml, msgpack
+-1 worker has a multiple worker
+
+What is celery Beat? 
+-task scheduler
+
+what is -django-celery-results package? 
+-store celery results to the Django database.
+-Query and display automatically to the django admin panel.
+
+why to use celery?
+-Suppose we need to access API every minute (hour),
+ or we want to send multiple emails at the end of the day. 
+ Celery can schedule that type of periodic task easily.
+-Third party API calls.
+-For High CPU intensive tasks.
+-Periodic/scheduled Tasks.
+-For improving the User Experience.
+-Reduce extra over workload.
+-asynchronous
+
+Why celery if we have multithreading, async, and multiprocessing?
+
+Celery execution pool implementations:
+-prefork(multiprocessing)[default]
+-solo
+-threads(multithreading)
+-eventlet
+-gevent
+
+start celery command
+-$ celery -A <project>.celery worker -l info
+-by default, pool - prefork and condurrency - no. of cores
+-celery -A <project>.celery worker --pool=solo -l info
+-celery -A <project>.celery worker --concurrency=5 -l info
+
+
 Celery basic setup
 
 Big word 
